@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import logoVirginAustralia from "./images/airlines/virgin-australia-logo.png";
 import "./App.css";
+import { compose, withProps } from "recompose";
 import {
   Button,
   Card,
@@ -16,6 +17,31 @@ import {
   Table,
   Title
 } from "reactbulma";
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  KmlLayer
+} from "react-google-maps";
+
+const MapComponentWithKmlLayer = compose(
+  withProps({
+    googleMapURL:
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places",
+    loadingElement: <div style={{ height: `100%` }} />,
+    containerElement: <div style={{ height: `400px` }} />,
+    mapElement: <div style={{ height: `100%` }} />
+  }),
+  withScriptjs,
+  withGoogleMap
+)(props => (
+  <GoogleMap defaultZoom={9} defaultCenter={{ lat: 1.35019, lng: 103.994003 }}>
+    <KmlLayer
+      url={process.env.PUBLIC_URL + "/kml/openflights-2018-01-26.kml"}
+      options={{ preserveViewport: true }}
+    />
+  </GoogleMap>
+));
 
 class App extends Component {
   render() {
@@ -145,6 +171,7 @@ class App extends Component {
                 </Media.Content>
                 <Media.Right>VA5668</Media.Right>
               </Media>
+              <MapComponentWithKmlLayer />
             </Card.Content>
           </Card>
         </Section>
