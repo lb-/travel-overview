@@ -156,8 +156,8 @@ class Overview extends Component {
 
 const Flights = ({ match }) => (
   <Section>
-    <Route path={`${match.url}/:flightNo`} component={Flight} />
     <Route exact path={match.url} render={FlightsOverview} />
+    <Route path={`${match.url}/:flightNo`} component={Flight} />
   </Section>
 );
 
@@ -177,7 +177,9 @@ const FlightsOverview = ({ match }) => {
         <FlightTableHeaderRow titles={titles} />
       </Table.Head>
       <Table.Body>
-        {flightItems.map(item => <FlightTableRow {...item} match={match} />)}
+        {flightItems.map((item, index) => (
+          <FlightTableRow {...item} match={match} index={index} />
+        ))}
       </Table.Body>
       <Table.Foot>
         <FlightTableHeaderRow titles={titles} />
@@ -192,8 +194,12 @@ class FlightTableHeaderRow extends Component {
     return (
       <Table.Tr>
         {this.props.titles.map(
-          title =>
-            title !== null ? <Table.Th>{title}</Table.Th> : <Table.Th />
+          (title, index) =>
+            title !== null ? (
+              <Table.Th key={index}>{title}</Table.Th>
+            ) : (
+              <Table.Th key={index} />
+            )
         )}
       </Table.Tr>
     );
@@ -238,7 +244,7 @@ class FlightTableTotalsRow extends Component {
 class FlightTableRow extends Component {
   render() {
     return (
-      <Table.Tr>
+      <Table.Tr key={this.props.index}>
         <Table.Td>
           <ButtonLink
             to={`${this.props.match.url}/${this.props.flightNo}`}
