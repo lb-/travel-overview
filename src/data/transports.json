@@ -392,7 +392,7 @@
   {
     "method": "Flight",
     "provider": "Brussels Airlines",
-    "fromDatetime": "2017-08-18 17T50:00",
+    "fromDatetime": "2017-08-18T17:50:00",
     "toDatetime": "2017-08-18T21:05",
     "fromAirport": "WAW",
     "fromStation": "",
@@ -407,7 +407,7 @@
   {
     "method": "Flight",
     "provider": "Brussels Airlines",
-    "fromDatetime": "2017-08-18 20T05:00",
+    "fromDatetime": "2017-08-18T20:05:00",
     "toDatetime": "2017-08-18T22:30",
     "fromAirport": "BRU",
     "fromStation": "",
@@ -437,8 +437,8 @@
   {
     "method": "Flight",
     "provider": "EVA Air",
-    "fromDatetime": "2017-09-26 13T15:00",
-    "toDatetime": "2017-09-27 17T05:00",
+    "fromDatetime": "2017-09-26T13:15:00",
+    "toDatetime": "2017-09-27T17:05:00",
     "fromAirport": "JFK",
     "fromStation": "",
     "toAirport": "TPE",
@@ -452,8 +452,8 @@
   {
     "method": "Flight",
     "provider": "EVA Air",
-    "fromDatetime": "2017-09-27 20T45:00",
-    "toDatetime": "2017-09-27 23T30:00",
+    "fromDatetime": "2017-09-27T20:45:00",
+    "toDatetime": "2017-09-27T23:30:00",
     "fromAirport": "TPE",
     "fromStation": "",
     "toAirport": "DMK",
