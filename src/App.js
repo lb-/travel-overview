@@ -30,7 +30,6 @@ import {
   Marker,
   Polyline
 } from "react-google-maps";
-// const { LatLng, LatLngBounds } = window.google.maps;
 
 const ButtonLink = ({ label, to, activeOnlyWhenExact }) => (
   <Route
