@@ -21,24 +21,53 @@ import {
   withScriptjs,
   withGoogleMap,
   GoogleMap,
-  KmlLayer
+  Marker,
+  Polyline
 } from "react-google-maps";
+// const { LatLng, LatLngBounds } = window.google.maps;
 
-const MapComponentWithKmlLayer = compose(
+const MapComponentWithFlight = compose(
   withProps({
     googleMapURL:
       "https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places",
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
-    mapElement: <div style={{ height: `100%` }} />
+    mapElement: <div style={{ height: `100%` }} />,
+    locationA: { lat: -27.384167, lng: 153.1175, airport_code: "BNE" },
+    locationB: { lat: 1.350189, lng: 103.994433, airport_code: "SIN" },
+    fitMarkerBounds: () => {
+      const bounds = this.getBounds();
+      const markerBounds = [
+        { lat: -27.384167, lng: 153.1175 },
+        { lat: 1.350189, lng: 103.994433 }
+      ];
+      markerBounds.forEach(bound => bounds.extend(bound));
+      this.refs.map.fitBounds(bounds);
+    }
   }),
   withScriptjs,
   withGoogleMap
 )(props => (
-  <GoogleMap defaultZoom={9} defaultCenter={{ lat: 1.35019, lng: 103.994003 }}>
-    <KmlLayer
-      url={process.env.PUBLIC_URL + "/kml/openflights-2018-01-26.kml"}
-      options={{ preserveViewport: true }}
+  <GoogleMap
+    defaultZoom={8}
+    defaultCenter={{ lat: props.locationA.lat, lng: props.locationA.lng }}
+    onTilesloaded={() => props.fitMarkerBounds()}
+  >
+    <Marker
+      position={{ lat: props.locationA.lat, lng: props.locationA.lng }}
+      label={"A"}
+    />
+    <Marker
+      position={{ lat: props.locationB.lat, lng: props.locationB.lng }}
+      label={"B"}
+    />
+    <Polyline
+      path={[
+        { lat: props.locationA.lat, lng: props.locationA.lng },
+        { lat: props.locationB.lat, lng: props.locationB.lng }
+      ]}
+      strokeColor={"#FFFFFF"}
+      strokeWeight={3}
     />
   </GoogleMap>
 ));
@@ -171,7 +200,7 @@ class App extends Component {
                 </Media.Content>
                 <Media.Right>VA5668</Media.Right>
               </Media>
-              <MapComponentWithKmlLayer />
+              <MapComponentWithFlight />
             </Card.Content>
           </Card>
         </Section>
