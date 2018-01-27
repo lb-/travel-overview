@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import NumbericLabel from "react-pretty-numbers";
-import logoVirginAustralia from "./images/airlines/virgin-australia-logo.png";
 import transportItems from "./data/transports.json";
+import airportItems from "./data/airports.json";
 import "./App.css";
 import { compose, withProps } from "recompose";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 import {
   Button,
   Card,
@@ -44,46 +44,22 @@ const ButtonLink = ({ label, to, activeOnlyWhenExact }) => (
   />
 );
 
-const MapComponentWithFlight = compose(
+const FlightMap = compose(
   withProps({
     googleMapURL:
       "https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places",
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
-    mapElement: <div style={{ height: `100%` }} />,
-    locationA: { lat: -27.384167, lng: 153.1175, airport_code: "BNE" },
-    locationB: { lat: 1.350189, lng: 103.994433, airport_code: "SIN" },
-    fitMarkerBounds: () => {
-      const bounds = this.getBounds();
-      const markerBounds = [
-        { lat: -27.384167, lng: 153.1175 },
-        { lat: 1.350189, lng: 103.994433 }
-      ];
-      markerBounds.forEach(bound => bounds.extend(bound));
-      this.refs.map.fitBounds(bounds);
-    }
+    mapElement: <div style={{ height: `100%` }} />
   }),
   withScriptjs,
   withGoogleMap
 )(props => (
-  <GoogleMap
-    defaultZoom={8}
-    defaultCenter={{ lat: props.locationA.lat, lng: props.locationA.lng }}
-    onTilesloaded={() => props.fitMarkerBounds()}
-  >
-    <Marker
-      position={{ lat: props.locationA.lat, lng: props.locationA.lng }}
-      label={"A"}
-    />
-    <Marker
-      position={{ lat: props.locationB.lat, lng: props.locationB.lng }}
-      label={"B"}
-    />
+  <GoogleMap defaultZoom={8} defaultCenter={props.toLocation}>
+    <Marker position={props.fromLocation} label="A" />
+    <Marker position={props.toLocation} label="B" />
     <Polyline
-      path={[
-        { lat: props.locationA.lat, lng: props.locationA.lng },
-        { lat: props.locationB.lat, lng: props.locationB.lng }
-      ]}
+      path={[props.fromLocation, props.toLocation]}
       strokeColor={"#FFFFFF"}
       strokeWeight={3}
     />
@@ -98,7 +74,6 @@ class App extends Component {
           <Hero info bold>
             <Hero.Body>
               <Container>
-                <Title>Flights</Title>
                 <SubTitle>An overview of flights from 2017</SubTitle>
                 <Field grouped>
                   <Control>
@@ -141,7 +116,6 @@ class Overview extends Component {
     ).length;
     return (
       <Section>
-        <Title>Overview</Title>
         <Level>
           <Level.Item hasTextCentered>
             <div>
@@ -183,8 +157,7 @@ class Overview extends Component {
 
 const Flights = ({ match }) => (
   <Section>
-    <Title>Flights</Title>
-    <Route path={`${match.url}/:flightCode`} component={Flight} />
+    <Route path={`${match.url}/:flightNo`} component={Flight} />
     <Route exact path={match.url} render={FlightsOverview} />
   </Section>
 );
@@ -292,51 +265,96 @@ class FlightTableRow extends Component {
   }
 }
 
-const Flight = ({ match }) => (
-  <Card>
-    <Card.Content>
-      <Media>
-        <Media.Left>
-          <Image
-            is="128x128"
-            src={logoVirginAustralia}
-            alt="Virgin Australia Logo"
-          />
-        </Media.Left>
-        <Media.Content>
-          <Title is="4">BNE &rarr; SIN</Title>
-          <SubTitle is="6">
-            Brisbane, Australia to Singapore, Singapore
-          </SubTitle>
-          <Content>
-            Airline: <strong>Virgin Australia</strong>
-            <br />
-            Airliner: <strong>Airbus A359</strong>
-            <br />
-            Time: <strong>480 minutes</strong>
-            <br />
-            Distance:{" "}
-            <strong>
-              6142.4 kilometers <sup>*</sup>
-            </strong>
-            <br />
-            Dates:{" "}
-            <strong> 11:09 PM - 1 Jan 2016 to 12:18 PM - 1 Jan 2017</strong>
-            <p>
-              <small>
-                <sup>*</sup> Great circle distance from{" "}
-                <a href="https://www.world-airport-codes.com/distance">
-                  World Airport Codes
-                </a>
-              </small>
-            </p>
-          </Content>
-        </Media.Content>
-        <Media.Right>{match.params.flightCode}</Media.Right>
-      </Media>
-      <MapComponentWithFlight />
-    </Card.Content>
-  </Card>
-);
+class Flight extends Component {
+  render() {
+    const flight = transportItems.find(
+      item => item.flightNo === this.props.match.params.flightNo
+    );
+    const toAirport = airportItems.find(
+      item => item.airportCode === flight.toAirport
+    );
+    const fromAirport = airportItems.find(
+      item => item.airportCode === flight.fromAirport
+    );
+    const interval = Interval.fromDateTimes(
+      DateTime.fromISO(flight.fromDatetime),
+      DateTime.fromISO(flight.toDatetime)
+    );
+    const airlineLogo = flight.provider
+      .trim()
+      .toLowerCase()
+      .replace(" ", "-");
+    const airlineLogoLocation = `/img/airlines/${airlineLogo}.svg`;
+    return (
+      <Card>
+        <FlightMap
+          fromLocation={{
+            lat: fromAirport.latitude,
+            lng: fromAirport.longitude
+          }}
+          toLocation={{
+            lat: toAirport.latitude,
+            lng: toAirport.longitude
+          }}
+        />
+        <Card.Content>
+          <Media>
+            <Media.Left>
+              <Image
+                is="128x128"
+                src={process.env.PUBLIC_URL + airlineLogoLocation}
+                alt={`${flight.provider} Logo`}
+              />
+            </Media.Left>
+            <Media.Content>
+              <Title is="4">
+                {toAirport.airportCode} &rarr; {fromAirport.airportCode}
+              </Title>
+              <SubTitle is="6">
+                {toAirport.airportName}, {toAirport.countryName}
+                &nbsp;&rarr;&nbsp;
+                {fromAirport.airportName}, {fromAirport.countryName}
+              </SubTitle>
+              <Content>
+                <dl>
+                  <dt>Airline:</dt>
+                  <dd>
+                    <strong>{flight.provider}</strong>
+                  </dd>
+                  <dt>Airliner:</dt>
+                  <dd>
+                    <strong>
+                      {flight.aircraftName} {flight.aircraftCode}
+                    </strong>
+                  </dd>
+                  <dt>Times:</dt>
+                  <dd>
+                    <strong>
+                      {interval.start.toLocaleString(DateTime.DATETIME_MED)} to{" "}
+                      {interval.end.toLocaleString(DateTime.DATETIME_MED)}
+                    </strong>
+                  </dd>
+                  <dd>{interval.length("minutes")} minutes</dd>
+                  <dt>Distance:</dt>
+                  <dd>
+                    <strong>6142.4 kilometers</strong>
+                    <br />
+                    <small>
+                      <sup>*</sup> Great circle distance from
+                      <a href="https://www.world-airport-codes.com/distance">
+                        World Airport Codes
+                      </a>
+                    </small>
+                  </dd>
+                </dl>
+              </Content>
+            </Media.Content>
+            <Media.Right>{this.props.match.params.flightNo}</Media.Right>
+          </Media>
+        </Card.Content>
+      </Card>
+    );
+  }
+}
 
 export default App;
