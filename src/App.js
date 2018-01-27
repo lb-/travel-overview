@@ -5,6 +5,7 @@ import logoVirginAustralia from "./images/airlines/virgin-australia-logo.png";
 import transportItems from "./data/transports.json";
 import "./App.css";
 import { compose, withProps } from "recompose";
+import { DateTime } from "luxon";
 import {
   Button,
   Card,
@@ -275,7 +276,12 @@ class FlightTableRow extends Component {
         <Table.Td>
           {this.props.fromAirport} &rarr; {this.props.toAirport}
         </Table.Td>
-        <Table.Td>{this.props.fromDatetime}</Table.Td>
+        <Table.Td>
+          {DateTime.fromISO(this.props.fromDatetime).toLocaleString({
+            month: "long",
+            day: "numeric"
+          })}
+        </Table.Td>
         <Table.Td>{this.props.timeMinutes}</Table.Td>
         <Table.Td>{this.props.provider}</Table.Td>
         <Table.Td>
