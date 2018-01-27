@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import NumbericLabel from "react-pretty-numbers";
 import logoVirginAustralia from "./images/airlines/virgin-australia-logo.png";
 import transportItems from "./data/transports.json";
 import "./App.css";
@@ -121,37 +122,63 @@ class App extends Component {
   }
 }
 
-const Overview = () => (
-  <Section>
-    <Title>Overview</Title>
-    <Level>
-      <Level.Item hasTextCentered>
-        <div>
-          <Heading>Flights</Heading>
-          <Title>21</Title>
-        </div>
-      </Level.Item>
-      <Level.Item hasTextCentered>
-        <div>
-          <Heading>Kilometers Flown</Heading>
-          <Title>123,000</Title>
-        </div>
-      </Level.Item>
-      <Level.Item hasTextCentered>
-        <div>
-          <Heading>Minutes in Air</Heading>
-          <Title>456,000</Title>
-        </div>
-      </Level.Item>
-      <Level.Item hasTextCentered>
-        <div>
-          <Heading>Airlines</Heading>
-          <Title>5</Title>
-        </div>
-      </Level.Item>
-    </Level>
-  </Section>
-);
+class Overview extends Component {
+  render() {
+    const flightItems = transportItems.filter(item => item.method === "Flight");
+    const totalDistanceFlown = flightItems.reduce(
+      (total, item) => total + item.distanceKilometers,
+      0
+    );
+    const totalMinutesFlown = flightItems.reduce(
+      (total, item) => total + item.timeMinutes,
+      0
+    );
+    const totalDifferentAirlines = flightItems.reduce(
+      (arr, item) =>
+        arr.includes(item.provider) ? arr : arr.concat([item.provider]),
+      []
+    ).length;
+    return (
+      <Section>
+        <Title>Overview</Title>
+        <Level>
+          <Level.Item hasTextCentered>
+            <div>
+              <Heading>Flights</Heading>
+              <Title>{flightItems.length}</Title>
+            </div>
+          </Level.Item>
+          <Level.Item hasTextCentered>
+            <div>
+              <Heading>Kilometers Flown</Heading>
+              <Title>
+                <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
+                  {totalDistanceFlown}
+                </NumbericLabel>
+              </Title>
+            </div>
+          </Level.Item>
+          <Level.Item hasTextCentered>
+            <div>
+              <Heading>Minutes in Air</Heading>
+              <Title>
+                <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
+                  {totalMinutesFlown}
+                </NumbericLabel>
+              </Title>
+            </div>
+          </Level.Item>
+          <Level.Item hasTextCentered>
+            <div>
+              <Heading>Airlines</Heading>
+              <Title>{totalDifferentAirlines}</Title>
+            </div>
+          </Level.Item>
+        </Level>
+      </Section>
+    );
+  }
+}
 
 const Flights = ({ match }) => (
   <Section>
