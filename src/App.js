@@ -191,11 +191,24 @@ class App extends Component {
                     <br />
                     Time: <strong>480 minutes</strong>
                     <br />
-                    Distance: <strong>1091 kilometers</strong>
+                    Distance:{" "}
+                    <strong>
+                      6142.4 kilometers <sup>*</sup>
+                    </strong>
                     <br />
-                    <small>
+                    Dates:{" "}
+                    <strong>
+                      {" "}
                       11:09 PM - 1 Jan 2016 to 12:18 PM - 1 Jan 2017
-                    </small>
+                    </strong>
+                    <p>
+                      <small>
+                        <sup>*</sup> Great circle distance from{" "}
+                        <a href="https://www.world-airport-codes.com/distance">
+                          World Airport Codes
+                        </a>
+                      </small>
+                    </p>
                   </Content>
                 </Media.Content>
                 <Media.Right>VA5668</Media.Right>
