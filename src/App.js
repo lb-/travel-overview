@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import logoVirginAustralia from "./images/airlines/virgin-australia-logo.png";
+import transportItems from "./data/transports.json";
 import "./App.css";
 import { compose, withProps } from "recompose";
 import {
@@ -160,60 +161,103 @@ const Flights = ({ match }) => (
   </Section>
 );
 
-const FlightsOverview = ({ match }) => (
-  <Table hoverable striped className="is-fullwidth">
-    <Table.Head>
+const FlightsOverview = ({ match }) => {
+  const flightItems = transportItems.filter(item => item.method === "Flight");
+  const titles = [
+    null,
+    "Flight",
+    "Date",
+    "Time (Minutes)",
+    "Airline",
+    "Airliner"
+  ];
+  return (
+    <Table hoverable striped className="is-fullwidth">
+      <Table.Head>
+        <FlightTableHeaderRow titles={titles} />
+      </Table.Head>
+      <Table.Body>
+        {flightItems.map(item => <FlightTableRow {...item} match={match} />)}
+      </Table.Body>
+      <Table.Foot>
+        <FlightTableHeaderRow titles={titles} />
+        <FlightTableTotalsRow items={flightItems} />
+      </Table.Foot>
+    </Table>
+  );
+};
+
+class FlightTableHeaderRow extends Component {
+  render() {
+    return (
       <Table.Tr>
-        <Table.Th />
-        <Table.Th>Flight</Table.Th>
-        <Table.Th>Date</Table.Th>
-        <Table.Th>Time (Minutes)</Table.Th>
-        <Table.Th>Airline</Table.Th>
-        <Table.Th>Airliner</Table.Th>
+        {this.props.titles.map(
+          title =>
+            title !== null ? <Table.Th>{title}</Table.Th> : <Table.Th />
+        )}
       </Table.Tr>
-    </Table.Head>
-    <Table.Body>
-      <Table.Tr>
-        <Table.Td>
-          <ButtonLink to={`${match.url}/VA5668`} label={"VA5668"} />
-        </Table.Td>
-        <Table.Td>BNE &rarr; SIN</Table.Td>
-        <Table.Td>2017-01-12</Table.Td>
-        <Table.Td>480</Table.Td>
-        <Table.Td>Virgin Australia</Table.Td>
-        <Table.Td>Airbus</Table.Td>
-      </Table.Tr>
-      <Table.Tr>
-        <Table.Td>
-          <ButtonLink to={`${match.url}/VA5669`} label={"VA5669"} />
-        </Table.Td>
-        <Table.Td>SIN &rarr; SGN</Table.Td>
-        <Table.Td>2017-01-12</Table.Td>
-        <Table.Td>130</Table.Td>
-        <Table.Td>Virgin Australia</Table.Td>
-        <Table.Td>Airbus</Table.Td>
-      </Table.Tr>
-    </Table.Body>
-    <Table.Foot>
+    );
+  }
+}
+
+class FlightTableTotalsRow extends Component {
+  render() {
+    return (
       <Table.Tr>
         <Table.Th>Totals</Table.Th>
-        <Table.Th>21</Table.Th>
+        <Table.Th>{this.props.items.length}</Table.Th>
         <Table.Th />
-        <Table.Th>312</Table.Th>
-        <Table.Th>10</Table.Th>
-        <Table.Th>4</Table.Th>
+        <Table.Th>
+          {this.props.items.reduce(
+            (total, item) => item.timeMinutes + total,
+            0
+          )}
+        </Table.Th>
+        <Table.Th>
+          {
+            this.props.items.reduce(
+              (arr, item) =>
+                arr.includes(item.provider) ? arr : arr.concat([item.provider]),
+              []
+            ).length
+          }
+        </Table.Th>
+        <Table.Th>
+          {
+            this.props.items.reduce((arr, item) => {
+              const airliner = item.aircraftName + item.aircraftCode;
+              return arr.includes(airliner) ? arr : arr.concat([airliner]);
+            }, []).length
+          }
+        </Table.Th>
       </Table.Tr>
+    );
+  }
+}
+
+class FlightTableRow extends Component {
+  render() {
+    return (
       <Table.Tr>
-        <Table.Th />
-        <Table.Th>Flight</Table.Th>
-        <Table.Th>Date</Table.Th>
-        <Table.Th>Time (Minutes)</Table.Th>
-        <Table.Th>Airline</Table.Th>
-        <Table.Th>Airliner</Table.Th>
+        <Table.Td>
+          <ButtonLink
+            to={`${this.props.match.url}/${this.props.flightNo}`}
+            label={`View ${this.props.flightNo}`}
+          />
+        </Table.Td>
+        <Table.Td>
+          {this.props.fromAirport} &rarr; {this.props.toAirport}
+        </Table.Td>
+        <Table.Td>{this.props.fromDatetime}</Table.Td>
+        <Table.Td>{this.props.timeMinutes}</Table.Td>
+        <Table.Td>{this.props.provider}</Table.Td>
+        <Table.Td>
+          {this.props.aircraftName} {this.props.aircraftCode}
+        </Table.Td>
       </Table.Tr>
-    </Table.Foot>
-  </Table>
-);
+    );
+  }
+}
 
 const Flight = ({ match }) => (
   <Card>
