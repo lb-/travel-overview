@@ -3,3 +3,11 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+section.hero.branded {
+  background-color: #f36f54;
+}
+
+section.hero.branded h1.title {
+  color: white;
+}

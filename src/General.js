@@ -27,7 +27,7 @@ const ButtonLink = ({ label, to, activeOnlyWhenExact }) => (
 );
 
 const HeroHeader = () => (
-  <Hero info bold>
+  <Hero bold className="branded">
     <Hero.Body>
       <Container>
         <Title>Travels</Title>
