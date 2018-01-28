@@ -169,7 +169,7 @@ class Overview extends Component {
 const Flights = ({ match }) => (
   <Section>
     <Route exact path={match.url} render={FlightsOverview} />
-    <Route path={`${match.url}/:flightNo`} component={Flight} />
+    <Route path={`${match.url}/:flightNo`} component={RoutedFlight} />
   </Section>
 );
 
@@ -256,7 +256,7 @@ class FlightTableTotalsRow extends Component {
 class FlightTableRow extends Component {
   render() {
     return (
-      <Table.Tr key={this.props.index}>
+      <Table.Tr>
         <Table.Td>
           <ButtonLink
             to={`${this.props.match.url}/${this.props.flightNo}`}
@@ -282,96 +282,98 @@ class FlightTableRow extends Component {
   }
 }
 
-class Flight extends Component {
-  render() {
-    const flight = transportItems.find(
-      item => item.flightNo === this.props.match.params.flightNo
-    );
-    const toAirport = airportItems.find(
-      item => item.airportCode === flight.toAirport
-    );
-    const fromAirport = airportItems.find(
-      item => item.airportCode === flight.fromAirport
-    );
-    const interval = Interval.fromDateTimes(
-      DateTime.fromISO(flight.fromDatetime),
-      DateTime.fromISO(flight.toDatetime)
-    );
-    const airlineLogo = flight.provider
-      .trim()
-      .toLowerCase()
-      .replace(" ", "-");
-    const airlineLogoLocation = `/img/airlines/${airlineLogo}.svg`;
-    return (
-      <Card>
-        <FlightMap
-          fromLocation={{
-            lat: fromAirport.latitude,
-            lng: fromAirport.longitude
-          }}
-          toLocation={{
-            lat: toAirport.latitude,
-            lng: toAirport.longitude
-          }}
-        />
-        <Card.Content>
-          <Media>
-            <Media.Left>
-              <Image
-                is="128x128"
-                src={process.env.PUBLIC_URL + airlineLogoLocation}
-                alt={`${flight.provider} Logo`}
-              />
-            </Media.Left>
-            <Media.Content>
-              <Title is="4">
-                {toAirport.airportCode} &rarr; {fromAirport.airportCode}
-              </Title>
-              <SubTitle is="6">
-                {toAirport.airportName}, {toAirport.countryName}
-                &nbsp;&rarr;&nbsp;
-                {fromAirport.airportName}, {fromAirport.countryName}
-              </SubTitle>
-              <Content>
-                <dl>
-                  <dt>Airline:</dt>
-                  <dd>
-                    <strong>{flight.provider}</strong>
-                  </dd>
-                  <dt>Airliner:</dt>
-                  <dd>
-                    <strong>
-                      {flight.aircraftName} {flight.aircraftCode}
-                    </strong>
-                  </dd>
-                  <dt>Times:</dt>
-                  <dd>
-                    <strong>
-                      {interval.start.toLocaleString(DateTime.DATETIME_MED)} to{" "}
-                      {interval.end.toLocaleString(DateTime.DATETIME_MED)}
-                    </strong>
-                  </dd>
-                  <dd>{interval.length("minutes")} minutes</dd>
-                  <dt>Distance:</dt>
-                  <dd>
-                    <strong>6142.4 kilometers</strong>
-                    <br />
-                    <small>
-                      <sup>*</sup> Great circle distance from
-                      <a href="https://www.world-airport-codes.com/distance">
-                        World Airport Codes
-                      </a>
-                    </small>
-                  </dd>
-                </dl>
-              </Content>
-            </Media.Content>
-            <Media.Right>{this.props.match.params.flightNo}</Media.Right>
-          </Media>
-        </Card.Content>
-      </Card>
-    );
-  }
-}
+const RoutedFlight = ({ match }) => {
+  const flight = transportItems.find(
+    item => item.flightNo === match.params.flightNo
+  );
+  return <Flight flight={flight} />;
+};
+
+const Flight = ({ flight }) => {
+  const toAirport = airportItems.find(
+    item => item.airportCode === flight.toAirport
+  );
+  const fromAirport = airportItems.find(
+    item => item.airportCode === flight.fromAirport
+  );
+  const interval = Interval.fromDateTimes(
+    DateTime.fromISO(flight.fromDatetime),
+    DateTime.fromISO(flight.toDatetime)
+  );
+  const airlineLogo = flight.provider
+    .trim()
+    .toLowerCase()
+    .replace(" ", "-");
+  const airlineLogoLocation = `/img/airlines/${airlineLogo}.svg`;
+  return (
+    <Card>
+      <FlightMap
+        fromLocation={{
+          lat: fromAirport.latitude,
+          lng: fromAirport.longitude
+        }}
+        toLocation={{
+          lat: toAirport.latitude,
+          lng: toAirport.longitude
+        }}
+      />
+      <Card.Content>
+        <Media>
+          <Media.Left>
+            <Image
+              is="128x128"
+              src={process.env.PUBLIC_URL + airlineLogoLocation}
+              alt={`${flight.provider} Logo`}
+            />
+          </Media.Left>
+          <Media.Content>
+            <Title is="4">
+              {toAirport.airportCode} &rarr; {fromAirport.airportCode}
+            </Title>
+            <SubTitle is="6">
+              {toAirport.airportName}, {toAirport.countryName}
+              &nbsp;&rarr;&nbsp;
+              {fromAirport.airportName}, {fromAirport.countryName}
+            </SubTitle>
+            <Content>
+              <dl>
+                <dt>Airline:</dt>
+                <dd>
+                  <strong>{flight.provider}</strong>
+                </dd>
+                <dt>Airliner:</dt>
+                <dd>
+                  <strong>
+                    {flight.aircraftName} {flight.aircraftCode}
+                  </strong>
+                </dd>
+                <dt>Times:</dt>
+                <dd>
+                  <strong>
+                    {interval.start.toLocaleString(DateTime.DATETIME_MED)} to{" "}
+                    {interval.end.toLocaleString(DateTime.DATETIME_MED)}
+                  </strong>
+                </dd>
+                <dd>{interval.length("minutes")} minutes</dd>
+                <dt>Distance:</dt>
+                <dd>
+                  <strong>6142.4 kilometers</strong>
+                  <br />
+                  <small>
+                    <sup>*</sup> Great circle distance from
+                    <a href="https://www.world-airport-codes.com/distance">
+                      World Airport Codes
+                    </a>
+                  </small>
+                </dd>
+              </dl>
+            </Content>
+          </Media.Content>
+          <Media.Right>{flight.flightNo}</Media.Right>
+        </Media>
+      </Card.Content>
+    </Card>
+  );
+};
 
 export default App;
