@@ -241,33 +241,36 @@ const FlightsMap = compose(
   withGoogleMap
 )(props => {
   const bounds = new window.google.maps.LatLngBounds();
+  console.log("foo");
   const markerLocations = props.flights.reduce((locations, flight) => {
-    let fromLocation = {
+    const fromLocation = {
       lat: flight.fromAirport.latitude,
       lng: flight.fromAirport.longitude
     };
-    let toLocation = {
+    const toLocation = {
       lat: flight.toAirport.latitude,
       lng: flight.toAirport.longitude
     };
-    if (!locations.includes(fromLocation)) {
-      locations.push(fromLocation);
+    const fromLocationKey = `${fromLocation.lat}_${fromLocation.lng}`;
+    const toLocationKey = `${toLocation.lat}_${toLocation.lng}`;
+    if (!Object.keys(locations).includes(fromLocationKey)) {
+      locations[fromLocationKey] = fromLocation;
       bounds.extend(new window.google.maps.LatLng(fromLocation));
     }
-    if (!locations.includes(toLocation)) {
-      locations.push(toLocation);
+    if (!Object.keys(locations).includes(toLocationKey)) {
+      locations[toLocationKey] = toLocation;
       bounds.extend(new window.google.maps.LatLng(toLocation));
     }
     return locations;
-  }, []);
+  }, {});
   return (
     <GoogleMap
       defaultZoom={8}
       defaultCenter={props.toLocation}
       ref={map => map && map.fitBounds(bounds)}
     >
-      {markerLocations.map(location => (
-        <Marker position={location} key={`${location.lat}-${location.lng}`} />
+      {Object.entries(markerLocations).map(([key, position]) => (
+        <Marker position={position} key={key} />
       ))}
     </GoogleMap>
   );
