@@ -1,9 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import NumbericLabel from "react-pretty-numbers";
-import transportItems from "./data/transports.json";
-import airportItems from "./data/airports.json";
-import { DateTime, Interval } from "luxon";
 import {
   Container,
   Control,
@@ -18,46 +15,7 @@ import {
 import "./App.css";
 import ButtonLink from "./Buttons";
 import { FlightsOverview, Flight } from "./Flights";
-
-const flightsWithLocations = transportItems
-  .filter(item => item.method === "Flight")
-  .map(item => {
-    let flight = Object.assign({}, item);
-    flight.toAirport = airportItems.find(
-      item => item.airportCode === flight.toAirport
-    );
-    flight.fromAirport = airportItems.find(
-      item => item.airportCode === flight.fromAirport
-    );
-    flight.interval = Interval.fromDateTimes(
-      DateTime.fromISO(flight.fromDatetime),
-      DateTime.fromISO(flight.toDatetime)
-    );
-    const airlineLogo = flight.provider
-      .trim()
-      .toLowerCase()
-      .replace(" ", "-");
-    flight.airlineLogoLocation = `/img/airlines/${airlineLogo}.svg`;
-    return flight;
-  });
-
-const travelStats = {
-  totalFlights: flightsWithLocations.length,
-  totalDistanceFlown: flightsWithLocations.reduce(
-    (total, item) => total + item.distanceKilometers,
-    0
-  ),
-  totalMinutesFlown: flightsWithLocations.reduce(
-    // change to a duration and represent as hours, minutes
-    (total, item) => total + item.timeMinutes,
-    0
-  ),
-  totalDifferentAirlines: flightsWithLocations.reduce(
-    (arr, item) =>
-      arr.includes(item.provider) ? arr : arr.concat([item.provider]),
-    []
-  ).length
-};
+import { flightsWithLocations, travelStats } from "./data/Data";
 
 const App = () => (
   <Router>
