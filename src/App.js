@@ -95,10 +95,8 @@ const FlightMap = compose(
   withGoogleMap
 )(props => {
   const bounds = new window.google.maps.LatLngBounds();
-  const fromLatLng = new window.google.maps.LatLng(props.fromLocation);
-  const toLatLng = new window.google.maps.LatLng(props.toLocation);
-  bounds.extend(fromLatLng);
-  bounds.extend(toLatLng);
+  bounds.extend(new window.google.maps.LatLng(props.fromLocation));
+  bounds.extend(new window.google.maps.LatLng(props.toLocation));
   return (
     <GoogleMap
       defaultZoom={8}
