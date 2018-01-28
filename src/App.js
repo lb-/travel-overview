@@ -84,6 +84,7 @@ class App extends Component {
           <Hero info bold>
             <Hero.Body>
               <Container>
+                <Title>Travels</Title>
                 <SubTitle>An overview of flights from 2017</SubTitle>
                 <Field grouped>
                   <Control>
