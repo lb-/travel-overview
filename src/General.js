@@ -19,7 +19,7 @@ const ButtonLink = ({ label, to, activeOnlyWhenExact }) => (
     path={to}
     exact={activeOnlyWhenExact}
     children={({ match }) => (
-      <Button className={match ? "is-active" : ""}>
+      <Button className={match ? "is-active" : ""} light>
         <Link to={to}>{label}</Link>
       </Button>
     )}
