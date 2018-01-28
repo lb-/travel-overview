@@ -5,7 +5,7 @@ This is a demo application that shows some interesting stats and info about flig
 # Getting Started
 
 * Create a file `.env.local` in the project's root directory and ensure it contains:
-  * `REACT_APP_GOOGLE_MAPS_API_KEY=<MY_API_KEY_NOT_IN_QUOTES>``
+  * `REACT_APP_GOOGLE_MAPS_API_KEY=<MY_API_KEY_NOT_IN_QUOTES>`
 
 # Acknowledgements
 
