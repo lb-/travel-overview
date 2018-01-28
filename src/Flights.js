@@ -20,7 +20,7 @@ import {
 } from "react-google-maps";
 import { ButtonLink } from "./General";
 
-const googleMapsApiKey = "AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg";
+const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const googleMapsBaseUrl = "https://maps.googleapis.com/maps/api/js";
 const googleMapsURL = `${googleMapsBaseUrl}?key=${googleMapsApiKey}&v=3.exp&libraries=geometry,drawing,places`;
 const googleMapsPathOptions = {
