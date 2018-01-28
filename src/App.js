@@ -114,105 +114,86 @@ const FlightMap = compose(
   );
 });
 
-class App extends Component {
-  render() {
-    return (
-      <Router>
-        <main className="app">
-          <Hero info bold>
-            <Hero.Body>
-              <Container>
-                <Title>Travels</Title>
-                <SubTitle>An overview of flights from 2017</SubTitle>
-                <Field grouped>
-                  <Control>
-                    <ButtonLink
-                      activeOnlyWhenExact={true}
-                      to="/"
-                      label="Overview"
-                    />
-                  </Control>
-                  <Control>
-                    <ButtonLink to="/flights" label="Flights" />
-                  </Control>
-                </Field>
-              </Container>
-            </Hero.Body>
-          </Hero>
-          <Route exact path="/" component={Overview} />
-          <Route path="/flights" component={Flights} />
-        </main>
-      </Router>
-    );
-  }
-}
+const App = () => (
+  <Router>
+    <main className="app">
+      <Hero info bold>
+        <Hero.Body>
+          <Container>
+            <Title>Travels</Title>
+            <SubTitle>An overview of flights from 2017</SubTitle>
+            <Field grouped>
+              <Control>
+                <ButtonLink
+                  activeOnlyWhenExact={true}
+                  to="/"
+                  label="Overview"
+                />
+              </Control>
+              <Control>
+                <ButtonLink to="/flights" label="Flights" />
+              </Control>
+            </Field>
+          </Container>
+        </Hero.Body>
+      </Hero>
+      <Route exact path="/" component={RoutedOverview} />
+      <Route path="/flights" component={Flights} />
+    </main>
+  </Router>
+);
 
-class Overview extends Component {
-  render() {
-    const flightItems = transportItems.filter(item => item.method === "Flight");
-    const totalDistanceFlown = flightItems.reduce(
-      (total, item) => total + item.distanceKilometers,
-      0
-    );
-    const totalMinutesFlown = flightItems.reduce(
-      (total, item) => total + item.timeMinutes,
-      0
-    );
-    const totalDifferentAirlines = flightItems.reduce(
-      (arr, item) =>
-        arr.includes(item.provider) ? arr : arr.concat([item.provider]),
-      []
-    ).length;
-    return (
-      <Section>
-        <Level>
-          <Level.Item hasTextCentered>
-            <div>
-              <Heading>Flights</Heading>
-              <Title>{flightItems.length}</Title>
-            </div>
-          </Level.Item>
-          <Level.Item hasTextCentered>
-            <div>
-              <Heading>Kilometers Flown</Heading>
-              <Title>
-                <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
-                  {totalDistanceFlown}
-                </NumbericLabel>
-              </Title>
-            </div>
-          </Level.Item>
-          <Level.Item hasTextCentered>
-            <div>
-              <Heading>Minutes in Air</Heading>
-              <Title>
-                <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
-                  {totalMinutesFlown}
-                </NumbericLabel>
-              </Title>
-            </div>
-          </Level.Item>
-          <Level.Item hasTextCentered>
-            <div>
-              <Heading>Airlines</Heading>
-              <Title>{totalDifferentAirlines}</Title>
-            </div>
-          </Level.Item>
-        </Level>
-      </Section>
-    );
-  }
-}
+const RoutedOverview = ({ match }) => {
+  return <Overview stats={travelStats} />;
+};
+
+const Overview = ({ stats }) => (
+  <Section>
+    <Level>
+      <Level.Item hasTextCentered>
+        <div>
+          <Heading>Flights</Heading>
+          <Title>{stats.totalFlights}</Title>
+        </div>
+      </Level.Item>
+      <Level.Item hasTextCentered>
+        <div>
+          <Heading>Kilometers Flown</Heading>
+          <Title>
+            <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
+              {stats.totalDistanceFlown}
+            </NumbericLabel>
+          </Title>
+        </div>
+      </Level.Item>
+      <Level.Item hasTextCentered>
+        <div>
+          <Heading>Time in Air</Heading>
+          <Title>
+            <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
+              {stats.totalMinutesFlown}
+            </NumbericLabel>
+          </Title>
+        </div>
+      </Level.Item>
+      <Level.Item hasTextCentered>
+        <div>
+          <Heading>Airlines</Heading>
+          <Title>{stats.totalDifferentAirlines}</Title>
+        </div>
+      </Level.Item>
+    </Level>
+  </Section>
+);
 
 const Flights = ({ match }) => (
   <Section>
-    <Route exact path={match.url} render={FlightsOverview} />
+    <Route exact path={match.url} render={RoutedFlightsOverview} />
     <Route path={`${match.url}/:flightNo`} component={RoutedFlight} />
   </Section>
 );
 
-const FlightsOverview = ({ match }) => {
-  const flightItems = transportItems.filter(item => item.method === "Flight");
+const RoutedFlightsOverview = ({ match }) => {
   const titles = [
     null,
     "Flight",
@@ -222,196 +203,192 @@ const FlightsOverview = ({ match }) => {
     "Airliner"
   ];
   return (
-    <Table hoverable striped className="is-fullwidth">
-      <Table.Head>
-        <FlightTableHeaderRow titles={titles} />
-      </Table.Head>
-      <Table.Body>
-        {flightItems.map((item, index) => (
-          <FlightTableRow {...item} match={match} key={item.flightNo} />
-        ))}
-      </Table.Body>
-      <Table.Foot>
-        <FlightTableHeaderRow titles={titles} />
-        <FlightTableTotalsRow items={flightItems} />
-      </Table.Foot>
-    </Table>
+    <FlightsOverview
+      match={match}
+      titles={titles}
+      flights={flightsWithLocations}
+    />
   );
 };
 
-class FlightTableHeaderRow extends Component {
-  render() {
-    return (
-      <Table.Tr>
-        {this.props.titles.map(
-          (title, index) =>
-            title !== null ? (
-              <Table.Th key={index}>{title}</Table.Th>
-            ) : (
-              <Table.Th key={index} />
-            )
-        )}
-      </Table.Tr>
-    );
-  }
-}
+const FlightsOverview = ({ flights, match, titles }) => (
+  <Table hoverable striped className="is-fullwidth">
+    <Table.Head>
+      <FlightTableHeaderRow titles={titles} />
+    </Table.Head>
+    <Table.Body>
+      {flights.map((item, index) => (
+        <FlightTableRow {...item} match={match} key={item.flightNo} />
+      ))}
+    </Table.Body>
+    <Table.Foot>
+      <FlightTableHeaderRow titles={titles} />
+      <FlightTableTotalsRow items={flights} />
+    </Table.Foot>
+  </Table>
+);
 
-class FlightTableTotalsRow extends Component {
-  render() {
-    return (
-      <Table.Tr>
-        <Table.Th>Totals</Table.Th>
-        <Table.Th>{this.props.items.length}</Table.Th>
-        <Table.Th />
-        <Table.Th>
-          {this.props.items.reduce(
-            (total, item) => item.timeMinutes + total,
-            0
-          )}
-        </Table.Th>
-        <Table.Th>
-          {
-            this.props.items.reduce(
-              (arr, item) =>
-                arr.includes(item.provider) ? arr : arr.concat([item.provider]),
-              []
-            ).length
-          }
-        </Table.Th>
-        <Table.Th>
-          {
-            this.props.items.reduce((arr, item) => {
-              const airliner = item.aircraftName + item.aircraftCode;
-              return arr.includes(airliner) ? arr : arr.concat([airliner]);
-            }, []).length
-          }
-        </Table.Th>
-      </Table.Tr>
-    );
-  }
-}
+const FlightTableHeaderRow = ({ titles }) => (
+  <Table.Tr>
+    {titles.map(
+      (title, index) =>
+        title !== null ? (
+          <Table.Th key={index}>{title}</Table.Th>
+        ) : (
+          <Table.Th key={index} />
+        )
+    )}
+  </Table.Tr>
+);
 
-class FlightTableRow extends Component {
-  render() {
-    return (
-      <Table.Tr>
-        <Table.Td>
-          <ButtonLink
-            to={`${this.props.match.url}/${this.props.flightNo}`}
-            label={`View ${this.props.flightNo}`}
-          />
-        </Table.Td>
-        <Table.Td>
-          {this.props.fromAirport} &rarr; {this.props.toAirport}
-        </Table.Td>
-        <Table.Td>
-          {DateTime.fromISO(this.props.fromDatetime).toLocaleString({
-            month: "long",
-            day: "numeric"
-          })}
-        </Table.Td>
-        <Table.Td>{this.props.timeMinutes}</Table.Td>
-        <Table.Td>{this.props.provider}</Table.Td>
-        <Table.Td>
-          {this.props.aircraftName} {this.props.aircraftCode}
-        </Table.Td>
-      </Table.Tr>
-    );
-  }
-}
+const FlightTableTotalsRow = ({ items }) => (
+  <Table.Tr>
+    <Table.Th>Totals</Table.Th>
+    <Table.Th>{items.length}</Table.Th>
+    <Table.Th />
+    <Table.Th>
+      {items.reduce((total, item) => item.timeMinutes + total, 0)}
+    </Table.Th>
+    <Table.Th>
+      {
+        items.reduce(
+          (arr, item) =>
+            arr.includes(item.provider) ? arr : arr.concat([item.provider]),
+          []
+        ).length
+      }
+    </Table.Th>
+    <Table.Th>
+      {
+        items.reduce((arr, item) => {
+          const airliner = item.aircraftName + item.aircraftCode;
+          return arr.includes(airliner) ? arr : arr.concat([airliner]);
+        }, []).length
+      }
+    </Table.Th>
+  </Table.Tr>
+);
+
+const FlightTableRow = ({
+  flightNo,
+  match,
+  fromAirport,
+  toAirport,
+  fromDatetime,
+  timeMinutes,
+  provider,
+  aircraftCode,
+  aircraftName
+}) => (
+  <Table.Tr>
+    <Table.Td>
+      <ButtonLink to={`${match.url}/${flightNo}`} label={`View ${flightNo}`} />
+    </Table.Td>
+    <Table.Td>
+      {fromAirport.airportCode} &rarr; {toAirport.airportCode}
+    </Table.Td>
+    <Table.Td>
+      {DateTime.fromISO(fromDatetime).toLocaleString({
+        month: "long",
+        day: "numeric"
+      })}
+    </Table.Td>
+    <Table.Td>{timeMinutes}</Table.Td>
+    <Table.Td>{provider}</Table.Td>
+    <Table.Td>
+      {aircraftName} {aircraftCode}
+    </Table.Td>
+  </Table.Tr>
+);
 
 const RoutedFlight = ({ match }) => {
-  const flight = transportItems.find(
+  const flight = flightsWithLocations.find(
     item => item.flightNo === match.params.flightNo
   );
-  return <Flight flight={flight} />;
+  return <Flight {...flight} />;
 };
 
-const Flight = ({ flight }) => {
-  const toAirport = airportItems.find(
-    item => item.airportCode === flight.toAirport
-  );
-  const fromAirport = airportItems.find(
-    item => item.airportCode === flight.fromAirport
-  );
-  const interval = Interval.fromDateTimes(
-    DateTime.fromISO(flight.fromDatetime),
-    DateTime.fromISO(flight.toDatetime)
-  );
-  const airlineLogo = flight.provider
-    .trim()
-    .toLowerCase()
-    .replace(" ", "-");
-  const airlineLogoLocation = `/img/airlines/${airlineLogo}.svg`;
-  return (
-    <Card>
-      <FlightMap
-        fromLocation={{
-          lat: fromAirport.latitude,
-          lng: fromAirport.longitude
-        }}
-        toLocation={{
-          lat: toAirport.latitude,
-          lng: toAirport.longitude
-        }}
-      />
-      <Card.Content>
-        <Media>
-          <Media.Left>
-            <Image
-              is="128x128"
-              src={process.env.PUBLIC_URL + airlineLogoLocation}
-              alt={`${flight.provider} Logo`}
-            />
-          </Media.Left>
-          <Media.Content>
-            <Title is="4">
-              {toAirport.airportCode} &rarr; {fromAirport.airportCode}
-            </Title>
-            <SubTitle is="6">
-              {toAirport.airportName}, {toAirport.countryName}
-              &nbsp;&rarr;&nbsp;
-              {fromAirport.airportName}, {fromAirport.countryName}
-            </SubTitle>
-            <Content>
-              <dl>
-                <dt>Airline:</dt>
-                <dd>
-                  <strong>{flight.provider}</strong>
-                </dd>
-                <dt>Airliner:</dt>
-                <dd>
-                  <strong>
-                    {flight.aircraftName} {flight.aircraftCode}
-                  </strong>
-                </dd>
-                <dt>Times:</dt>
-                <dd>
-                  <strong>
-                    {interval.start.toLocaleString(DateTime.DATETIME_MED)} to{" "}
-                    {interval.end.toLocaleString(DateTime.DATETIME_MED)}
-                  </strong>
-                </dd>
-                <dd>{interval.length("minutes")} minutes</dd>
-                <dt>Distance:</dt>
-                <dd>
-                  <strong>6142.4 kilometers</strong>
-                  <br />
-                  <small>
-                    <sup>*</sup> Great circle distance from
-                    <a href="https://www.world-airport-codes.com/distance">
-                      World Airport Codes
-                    </a>
-                  </small>
-                </dd>
-              </dl>
-            </Content>
-          </Media.Content>
-          <Media.Right>{flight.flightNo}</Media.Right>
-        </Media>
-      </Card.Content>
-    </Card>
-  );
-};
+const Flight = ({
+  aircraftCode,
+  aircraftName,
+  airlineLogoLocation,
+  distanceKilometers,
+  flightNo,
+  fromAirport,
+  interval,
+  provider,
+  toAirport
+}) => (
+  <Card>
+    <FlightMap
+      fromLocation={{
+        lat: fromAirport.latitude,
+        lng: fromAirport.longitude
+      }}
+      toLocation={{
+        lat: toAirport.latitude,
+        lng: toAirport.longitude
+      }}
+    />
+    <Card.Content>
+      <Media>
+        <Media.Left>
+          <Image
+            is="128x128"
+            src={process.env.PUBLIC_URL + airlineLogoLocation}
+            alt={`${provider} Logo`}
+          />
+        </Media.Left>
+        <Media.Content>
+          <Title is="4">
+            {toAirport.airportCode} &rarr; {fromAirport.airportCode}
+          </Title>
+          <SubTitle is="6">
+            {toAirport.airportName}, {toAirport.countryName}
+            &nbsp;&rarr;&nbsp;
+            {fromAirport.airportName}, {fromAirport.countryName}
+          </SubTitle>
+          <Content>
+            <dl>
+              <dt>Airline:</dt>
+              <dd>
+                <strong>{provider}</strong>
+              </dd>
+              <dt>Airliner:</dt>
+              <dd>
+                <strong>
+                  {aircraftName} {aircraftCode}
+                </strong>
+              </dd>
+              <dt>Times:</dt>
+              <dd>
+                <strong>
+                  {interval.start.toLocaleString(DateTime.DATETIME_MED)}
+                  to
+                  {interval.end.toLocaleString(DateTime.DATETIME_MED)}
+                </strong>
+              </dd>
+              <dd>{interval.length("minutes")} minutes</dd>
+              <dt>Distance:</dt>
+              <dd>
+                <strong>
+                  <NumbericLabel params={{ precision: 2, justification: "L" }}>
+                    {distanceKilometers}
+                  </NumbericLabel>{" "}
+                  KMs
+                </strong>
+                <br />
+                <small>
+                  <sup>*</sup> Great circle distance
+                </small>
+              </dd>
+            </dl>
+          </Content>
+        </Media.Content>
+        <Media.Right>{flightNo}</Media.Right>
+      </Media>
+    </Card.Content>
+  </Card>
+);
 
 export default App;
