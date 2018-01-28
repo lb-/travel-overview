@@ -190,7 +190,7 @@ const FlightsOverview = ({ match }) => {
       </Table.Head>
       <Table.Body>
         {flightItems.map((item, index) => (
-          <FlightTableRow {...item} match={match} index={index} />
+          <FlightTableRow {...item} match={match} key={item.flightNo} />
         ))}
       </Table.Body>
       <Table.Foot>
