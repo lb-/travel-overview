@@ -77,11 +77,10 @@ const Overview = ({ stats }) => (
           <Icon large>
             <i className="fas fa-3x fa-clock" />
           </Icon>
-
           <Title>
-            <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
-              {stats.totalMinutesFlown}
-            </NumbericLabel>
+            {`${stats.totalFlightsDuration.hours} hrs ${
+              stats.totalFlightsDuration.minutes
+            } mins`}
           </Title>
           <Heading>Time in Air</Heading>
         </div>

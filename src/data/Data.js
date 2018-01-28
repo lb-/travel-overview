@@ -1,6 +1,6 @@
 import transportItems from "./transports.json";
 import airportItems from "./airports.json";
-import { DateTime, Interval } from "luxon";
+import { DateTime, Duration, Interval } from "luxon";
 
 const flightsWithLocations = transportItems
   .filter(item => item.method === "Flight")
@@ -30,11 +30,12 @@ const travelStats = {
     (total, item) => total + item.distanceKilometers,
     0
   ),
-  totalMinutesFlown: flightsWithLocations.reduce(
-    // change to a duration and represent as hours, minutes
-    (total, item) => total + item.timeMinutes,
-    0
-  ),
+  totalFlightsDuration: Duration.fromObject({
+    minutes: flightsWithLocations.reduce(
+      (total, item) => total + item.timeMinutes,
+      0
+    )
+  }).shiftTo("hours", "minutes"),
   totalDifferentAirlines: flightsWithLocations.reduce(
     (arr, item) =>
       arr.includes(item.provider) ? arr : arr.concat([item.provider]),
