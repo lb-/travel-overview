@@ -217,8 +217,10 @@ const FlightMap = compose(
       <Marker position={props.toLocation} label="B" />
       <Polyline
         path={[props.fromLocation, props.toLocation]}
-        strokeColor={"#FFFFFF"}
-        strokeWeight={3}
+        options={{
+          strokeColor: "#f36f54",
+          strokeWeight: 4
+        }}
       />
     </GoogleMap>
   );
