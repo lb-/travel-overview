@@ -17,7 +17,7 @@ const App = () => (
 );
 
 const RoutedOverview = ({ match }) => {
-  return <Overview stats={travelStats} />;
+  return <Overview stats={travelStats} flights={flightsWithLocations} />;
 };
 
 const FlightsSection = ({ match }) => (

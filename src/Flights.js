@@ -20,6 +20,14 @@ import {
 } from "react-google-maps";
 import { ButtonLink } from "./General";
 
+const googleMapsApiKey = "AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg";
+const googleMapsBaseUrl = "https://maps.googleapis.com/maps/api/js";
+const googleMapsURL = `${googleMapsBaseUrl}?key=${googleMapsApiKey}&v=3.exp&libraries=geometry,drawing,places`;
+const googleMapsPathOptions = {
+  strokeColor: "#f36f54",
+  strokeWeight: 4
+};
+
 const FlightsOverview = ({ flights, match, titles }) => (
   <Table hoverable striped className="is-fullwidth">
     <Table.Head>
@@ -195,8 +203,7 @@ const Flight = ({
 
 const FlightMap = compose(
   withProps({
-    googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places",
+    googleMapURL: googleMapsURL,
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
     mapElement: <div style={{ height: `100%` }} />
@@ -217,13 +224,53 @@ const FlightMap = compose(
       <Marker position={props.toLocation} label="B" />
       <Polyline
         path={[props.fromLocation, props.toLocation]}
-        options={{
-          strokeColor: "#f36f54",
-          strokeWeight: 4
-        }}
+        options={googleMapsPathOptions}
       />
     </GoogleMap>
   );
 });
 
-export { FlightsOverview, Flight };
+const FlightsMap = compose(
+  withProps({
+    googleMapURL: googleMapsURL,
+    loadingElement: <div style={{ height: `100%` }} />,
+    containerElement: <div style={{ height: `400px` }} />,
+    mapElement: <div style={{ height: `100%` }} />
+  }),
+  withScriptjs,
+  withGoogleMap
+)(props => {
+  const bounds = new window.google.maps.LatLngBounds();
+  const markerLocations = props.flights.reduce((locations, flight) => {
+    let fromLocation = {
+      lat: flight.fromAirport.latitude,
+      lng: flight.fromAirport.longitude
+    };
+    let toLocation = {
+      lat: flight.toAirport.latitude,
+      lng: flight.toAirport.longitude
+    };
+    if (!locations.includes(fromLocation)) {
+      locations.push(fromLocation);
+      bounds.extend(new window.google.maps.LatLng(fromLocation));
+    }
+    if (!locations.includes(toLocation)) {
+      locations.push(toLocation);
+      bounds.extend(new window.google.maps.LatLng(toLocation));
+    }
+    return locations;
+  }, []);
+  return (
+    <GoogleMap
+      defaultZoom={8}
+      defaultCenter={props.toLocation}
+      ref={map => map && map.fitBounds(bounds)}
+    >
+      {markerLocations.map(location => (
+        <Marker position={location} key={`${location.lat}-${location.lng}`} />
+      ))}
+    </GoogleMap>
+  );
+});
+
+export { FlightsOverview, Flight, FlightsMap };

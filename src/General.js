@@ -14,6 +14,7 @@ import {
 } from "reactbulma";
 import NumbericLabel from "react-pretty-numbers";
 import { Route, Link } from "react-router-dom";
+import { FlightsMap } from "./Flights";
 
 const ButtonLink = ({ label, to, activeOnlyWhenExact }) => (
   <Route
@@ -46,7 +47,7 @@ const HeroHeader = () => (
   </Hero>
 );
 
-const Overview = ({ stats }) => (
+const Overview = ({ stats, flights }) => (
   <Section>
     <Level>
       <Level.Item hasTextCentered>
@@ -63,7 +64,6 @@ const Overview = ({ stats }) => (
           <Icon large>
             <i className="fas fa-3x fa-globe" />
           </Icon>
-
           <Title>
             <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
               {stats.totalDistanceFlown}
@@ -96,6 +96,7 @@ const Overview = ({ stats }) => (
         </div>
       </Level.Item>
     </Level>
+    <FlightsMap flights={flights} />
   </Section>
 );
 
