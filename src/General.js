@@ -4,6 +4,7 @@ import {
   Container,
   Control,
   Field,
+  Icon,
   Heading,
   Hero,
   Level,
@@ -50,34 +51,49 @@ const Overview = ({ stats }) => (
     <Level>
       <Level.Item hasTextCentered>
         <div>
-          <Heading>Flights</Heading>
+          <Icon large>
+            <i className="fas fa-3x fa-plane" />
+          </Icon>
           <Title>{stats.totalFlights}</Title>
+          <Heading>Flights</Heading>
         </div>
       </Level.Item>
       <Level.Item hasTextCentered>
         <div>
-          <Heading>Kilometers Flown</Heading>
+          <Icon large>
+            <i className="fas fa-3x fa-globe" />
+          </Icon>
+
           <Title>
             <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
               {stats.totalDistanceFlown}
             </NumbericLabel>
           </Title>
+          <Heading>Kilometers Flown</Heading>
         </div>
       </Level.Item>
       <Level.Item hasTextCentered>
         <div>
-          <Heading>Time in Air</Heading>
+          <Icon large>
+            <i className="fas fa-3x fa-clock" />
+          </Icon>
+
           <Title>
             <NumbericLabel params={{ shortFormat: true, precision: 2 }}>
               {stats.totalMinutesFlown}
             </NumbericLabel>
           </Title>
+          <Heading>Time in Air</Heading>
         </div>
       </Level.Item>
       <Level.Item hasTextCentered>
         <div>
-          <Heading>Airlines</Heading>
+          <Icon large>
+            <i className="fas fa-3x fa-fighter-jet" />
+          </Icon>
+
           <Title>{stats.totalDifferentAirlines}</Title>
+          <Heading>Airlines</Heading>
         </div>
       </Level.Item>
     </Level>
