@@ -165,9 +165,9 @@ const Flight = ({
               <dt>Times:</dt>
               <dd>
                 <strong>
-                  {interval.start.toLocaleString(DateTime.DATETIME_MED)}
-                  to
-                  {interval.end.toLocaleString(DateTime.DATETIME_MED)}
+                  {`${interval.start.toLocaleString(
+                    DateTime.DATETIME_MED
+                  )} to ${interval.end.toLocaleString(DateTime.DATETIME_MED)}`}
                 </strong>
               </dd>
               <dd>{interval.length("minutes")} minutes</dd>
