@@ -18,7 +18,7 @@ import {
   Marker,
   Polyline
 } from "react-google-maps";
-import ButtonLink from "./Buttons";
+import { ButtonLink } from "./General";
 
 const FlightsOverview = ({ flights, match, titles }) => (
   <Table hoverable striped className="is-fullwidth">
