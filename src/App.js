@@ -1,13 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import NumbericLabel from "react-pretty-numbers";
 import transportItems from "./data/transports.json";
 import airportItems from "./data/airports.json";
-import "./App.css";
 import { compose, withProps } from "recompose";
 import { DateTime, Interval } from "luxon";
 import {
-  Button,
   Card,
   Container,
   Content,
@@ -30,6 +28,8 @@ import {
   Marker,
   Polyline
 } from "react-google-maps";
+import "./App.css";
+import ButtonLink from "./Buttons";
 
 const flightsWithLocations = transportItems
   .filter(item => item.method === "Flight")
@@ -70,18 +70,6 @@ const travelStats = {
     []
   ).length
 };
-
-const ButtonLink = ({ label, to, activeOnlyWhenExact }) => (
-  <Route
-    path={to}
-    exact={activeOnlyWhenExact}
-    children={({ match }) => (
-      <Button className={match ? "is-active" : ""}>
-        <Link to={to}>{label}</Link>
-      </Button>
-    )}
-  />
-);
 
 const FlightMap = compose(
   withProps({
