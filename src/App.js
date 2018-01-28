@@ -53,17 +53,28 @@ const FlightMap = compose(
   }),
   withScriptjs,
   withGoogleMap
-)(props => (
-  <GoogleMap defaultZoom={8} defaultCenter={props.toLocation}>
-    <Marker position={props.fromLocation} label="A" />
-    <Marker position={props.toLocation} label="B" />
-    <Polyline
-      path={[props.fromLocation, props.toLocation]}
-      strokeColor={"#FFFFFF"}
-      strokeWeight={3}
-    />
-  </GoogleMap>
-));
+)(props => {
+  const bounds = new window.google.maps.LatLngBounds();
+  const fromLatLng = new window.google.maps.LatLng(props.fromLocation);
+  const toLatLng = new window.google.maps.LatLng(props.toLocation);
+  bounds.extend(fromLatLng);
+  bounds.extend(toLatLng);
+  return (
+    <GoogleMap
+      defaultZoom={8}
+      defaultCenter={props.toLocation}
+      ref={map => map && map.fitBounds(bounds)}
+    >
+      <Marker position={props.fromLocation} label="A" />
+      <Marker position={props.toLocation} label="B" />
+      <Polyline
+        path={[props.fromLocation, props.toLocation]}
+        strokeColor={"#FFFFFF"}
+        strokeWeight={3}
+      />
+    </GoogleMap>
+  );
+});
 
 class App extends Component {
   render() {
